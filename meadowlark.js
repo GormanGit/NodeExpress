@@ -11,6 +11,16 @@ app.set('view engine', 'handlebars' );
 
 app.set('port', process.env.PORT || 3000);
 
+app.use(express.static(__dirname + '/public'));
+
+var fortune = [
+  "Conquer your fears or they will conquer you.",
+  "Rivers need springs.",
+  "Do not fear what you don't know.",
+  "You will have a pleasant surprise.",
+  "Whenever possible, keep it simple.",
+]
+
 app.get('/', function(req, res){
   res.render('home')
   // res.type('text/plain');
@@ -19,24 +29,43 @@ app.get('/', function(req, res){
 });
 
 app.get('/about', function(req, res){
-  res.type('text/plain');
-  res.send('About Meadowlark Travel');
+  var randomFortune =
+    fortune[Math.floor(Math.random()* fortune.length)];
+  res.render('about', {fortune: randomFortune});
 });
 
-//custom 404 page
-app.use(function(req, res){
-  res.type('text/plain');
+//404 catch-all handeler (middleware)
+app.use(function(req, res, next){
   res.status(404);
-  res.send('404 - Not Found');
+  res.render('404');
 });
 
-//custom 500 page
+//500 error handler (middleware)
 app.use(function(err, req, res, next){
-  console.log(err.stack);
-  res.type('text/plain');
+  console.error(err.stack);
   res.status(500);
-  res.send('500 - Server Error')
+  res.render('500')
 });
+
+// app.get('/about', function(req, res){
+//   res.type('text/plain');
+//   res.send('About Meadowlark Travel');
+// });
+//
+// //custom 404 page
+// app.use(function(req, res){
+//   res.type('text/plain');
+//   res.status(404);
+//   res.send('404 - Not Found');
+// });
+//
+// //custom 500 page
+// app.use(function(err, req, res, next){
+//   console.log(err.stack);
+//   res.type('text/plain');
+//   res.status(500);
+//   res.send('500 - Server Error')
+// });
 
 app.listen(app.get('port'), function(){
   console.log('Express started on http://localhost:' +
